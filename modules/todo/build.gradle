@@ -34,6 +34,15 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
+	// Spring Boot Actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// Spring Cloud Sleuth
+	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+
+	// Spring Security (OAUTH2 Resource Server)
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+
 	// Web
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
@@ -43,16 +52,10 @@ dependencies {
     compile "io.springfox:springfox-swagger2:2.9.2"
 	compile "org.openapitools:jackson-databind-nullable:0.2.1"
 
-	// Security
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-
 	// DB
 	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
 	runtimeOnly 'io.r2dbc:r2dbc-postgresql'
 	runtimeOnly 'org.postgresql:postgresql'
-
-	// Sleuth
-	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
 
 	// Spring JMS (ActiveMQ)
 	implementation 'org.springframework:spring-jms'

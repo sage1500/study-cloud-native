@@ -12,8 +12,7 @@ public class SecurityConfig {
         // 認可設定
         // @formatter:off
         http.authorizeExchange()
-                .pathMatchers("/health").permitAll()
-                .pathMatchers("/message/**").hasAuthority("SCOPE_message:read")
+                .pathMatchers("/manage/**").permitAll()
                 .anyExchange().authenticated();
         // @formatter:on
 

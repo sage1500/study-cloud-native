@@ -24,22 +24,24 @@ ext {
 }
 
 dependencies {
+	// DevTools
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// Web
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	// Spring Boot Actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-	// Actutor
-	//implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	// Spring Cloud Sleuth
+	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
 
-	// Security
+	// Spring Security (OAUTH2 Resource Server)
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
-	// Sleuth
-	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+	// Web
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'

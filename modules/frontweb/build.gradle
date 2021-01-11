@@ -27,30 +27,25 @@ ext {
 }
 
 dependencies {
+	// DevTools
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
 	// Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// Spring Actuator
+	// Spring Boot Actuator
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 	// Spring Cloud Sleuth
 	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
 
-	// Web + Thymeleaf
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
 	// Spring Security (OAUTH2 Client)
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
-	// for OpenAPI Generator
-	implementation "org.springframework.boot:spring-boot-starter-validation"
-	compile "io.springfox:springfox-swagger-ui:2.9.2"
-    compile "io.springfox:springfox-swagger2:2.9.2"
-	compile "org.openapitools:jackson-databind-nullable:0.2.1"
-	compile "com.google.code.findbugs:jsr305:3.0.2"
+	// Web + Thymeleaf
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
 	// Spring Session (Redis)
 	implementation 'org.springframework.session:spring-session-data-redis'
@@ -59,6 +54,13 @@ dependencies {
 	// dozer
 	implementation "com.github.dozermapper:dozer-spring-boot-starter:6.5.0"
 	implementation "javax.xml.bind:jaxb-api:2.3.1"
+
+	// for OpenAPI Generator
+	implementation "org.springframework.boot:spring-boot-starter-validation"
+	compile "io.springfox:springfox-swagger-ui:2.9.2"
+    compile "io.springfox:springfox-swagger2:2.9.2"
+	compile "org.openapitools:jackson-databind-nullable:0.2.1"
+	compile "com.google.code.findbugs:jsr305:3.0.2"
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'

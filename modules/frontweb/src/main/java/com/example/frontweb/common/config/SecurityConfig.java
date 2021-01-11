@@ -19,9 +19,12 @@ public class SecurityConfig {
         http.csrf().disable();
 
         // 認可設定
+        // @formatter:off
         http.authorizeExchange()
                 .pathMatchers("/").permitAll()
+                .pathMatchers("/manage/**").permitAll()
                 .anyExchange().authenticated();
+        // @formatter:on
 
         // OAuth2 Client
         http.oauth2Client();
@@ -31,8 +34,7 @@ public class SecurityConfig {
 
         // ログアウト
         http.logout(logout -> {
-            var logoutSuccessHandler = new OidcClientInitiatedServerLogoutSuccessHandler(
-                    clientRegistrationRepository);
+            var logoutSuccessHandler = new OidcClientInitiatedServerLogoutSuccessHandler(clientRegistrationRepository);
             logoutSuccessHandler.setLogoutSuccessUrl(URI.create("/"));
             logoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}/");
 
