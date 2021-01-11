@@ -1,0 +1,37 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>完了 - TODO新規作成</title>
+    <link th:href="@{/css/content.css}" rel="stylesheet">
+</head>
+
+<body>
+    <h2>完了 - TODO新規作成</h2>
+
+    <div class="complete">
+        <span th:text="${message}"></span>
+
+        <table th:object="${todoForm}">
+            <tr>
+                <td>ID</td>
+                <td th:text="*{todoId}"></td>
+            </tr>
+            <tr>
+                <td>件名</td>
+                <td th:text="*{todoTitle}"></td>
+            </tr>
+            <tr>
+                <td>バージョン</td>
+                <td th:text="*{version}"></td>
+            </tr>
+        </table>
+    </div>
+
+    <form th:action="@{/todo/}">
+        <button>一覧に戻る</button>
+    </form>
+</body>
+
+</html>

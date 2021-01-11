@@ -1,0 +1,35 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>確認 - TODO新規作成</title>
+    <link th:href="@{/css/content.css}" rel="stylesheet">
+</head>
+
+<body>
+    <h2>確認 - TODO新規作成</h2>
+
+    <div class="confirm">
+        以下の内容で登録します。
+
+        <table th:object="${todoForm}">
+            <tr>
+                <td>件名</td>
+                <td th:text="*{todoTitle}"></td>
+            </tr>
+        </table>
+    </div>
+
+    <form th:action="@{/todo/create/cancel}">
+        <button>キャンセル</button>
+    </form>
+    <form th:action="@{/todo/create/input}" th:method="post">
+        <button>再入力</button>
+    </form>
+    <form th:action="@{/todo/create/execute}" th:method="post">
+        <button>作成</button>
+    </form>
+</body>
+
+</html>

@@ -1,0 +1,103 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.0'
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+	id 'java'
+
+	// OpenAPI Generator
+	id "org.openapi.generator" version "4.2.1"
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+ext {
+	set('springCloudVersion', "2020.0.0-M6")
+}
+
+dependencies {
+	// DevTools
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// Spring Boot Actuator
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	// Spring Cloud Sleuth
+	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+
+	// Spring Security (OAUTH2 Client)
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+	// Web + Thymeleaf
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	// Spring Session (Redis)
+	implementation 'org.springframework.session:spring-session-data-redis'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// dozer
+	implementation "com.github.dozermapper:dozer-spring-boot-starter:6.5.0"
+	implementation "javax.xml.bind:jaxb-api:2.3.1"
+
+	// for OpenAPI Generator
+	implementation "org.springframework.boot:spring-boot-starter-validation"
+	compile "io.springfox:springfox-swagger-ui:2.9.2"
+    compile "io.springfox:springfox-swagger2:2.9.2"
+	compile "org.openapitools:jackson-databind-nullable:0.2.1"
+	compile "com.google.code.findbugs:jsr305:3.0.2"
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+test {
+	useJUnitPlatform()
+}
+
+// OpenAPI
+task buildTodoClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
+    generatorName = "java"
+    inputSpec = "$projectDir/src/main/spec/todo.yml"
+    outputDir = "$buildDir/generated"
+	modelNameSuffix = "Resource"
+	configOptions = [
+		apiPackage: 'com.example.api.frontweb.client.api',
+		invokerPackage: 'com.example.api.frontweb.client.invoker',
+		modelPackage: 'com.example.api.frontweb.client.model',
+		dateLibrary: 'legacy',
+		java8: 'true',
+		library: 'webclient',
+	]
+    systemProperties = [
+        modelDocs: 'false'
+    ]
+}
+
+// compileJava のタスク実行前に buildTodoServer タスクを実行する。
+compileJava.dependsOn tasks.buildTodoClient
+
+// 生成したコードの出力先をソースフォルダに設定（コンパイル対象にするために）
+sourceSets.main.java.srcDir "${buildTodoClient.outputDir.get()}/src/main/java"
+sourceSets.main.resources.srcDir "${buildTodoClient.outputDir.get()}/src/main/resources"
