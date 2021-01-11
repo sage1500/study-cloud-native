@@ -1,4 +1,4 @@
-package com.example.hello.controller;
+package com.example.hello.app;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -7,15 +7,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/hello")
 @Slf4j
 public class HelloController {
-    @GetMapping
-    public Mono<String> hello(@AuthenticationPrincipal Jwt jwt) {
-        log.info("★hello jwt={}", jwt);
-        return Mono.just("Hello " + jwt.getClaimAsString("preferred_username"));
+    @GetMapping("/")
+    public String hello(@AuthenticationPrincipal Jwt jwt) {
+        log.debug("[HELLO]hello jwt={}", jwt);
+        return "Hello " + jwt.getClaimAsString("preferred_username");
     }
 }

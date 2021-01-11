@@ -1,10 +1,9 @@
-package com.example.todo.controller;
+package com.example.todo.app;
 
 import javax.validation.Valid;
 
 import com.example.api.todo.server.api.TodosApi;
 import com.example.api.todo.server.model.TodoResource;
-import com.example.todo.app.notifier.TodoChangeEvent;
 import com.example.todo.domain.entity.Todo;
 import com.example.todo.domain.service.TodoService;
 
@@ -96,9 +95,7 @@ public class TodoController implements TodosApi {
     }
 
     private String getUser(JwtAuthenticationToken token) {
-        var jwt = token.getToken();
-        log.info("★token pri = {}", token.getPrincipal());
-        return jwt.getClaimAsString("preferred_username");
+        return getUser(token.getToken());
     }
 
     private TodoResource toTodoResource(Todo todo) {

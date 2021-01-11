@@ -1,4 +1,4 @@
-package com.example.todo.app.notifier;
+package com.example.todo.app;
 
 import lombok.Data;
 

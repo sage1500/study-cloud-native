@@ -1,4 +1,4 @@
-package com.example.frontweb.controller.todo;
+package com.example.frontweb.app.todo;
 
 import com.example.api.frontweb.client.api.TodosApi;
 import com.github.dozermapper.core.Mapper;

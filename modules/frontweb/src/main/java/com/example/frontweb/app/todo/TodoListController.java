@@ -1,4 +1,4 @@
-package com.example.frontweb.controller.todo;
+package com.example.frontweb.app.todo;
 
 import com.example.api.frontweb.client.api.TodosApi;
 
@@ -24,7 +24,7 @@ public class TodoListController {
 
         // TODO一覧取得API呼出し
         return todosApi.listTodos().collectList().map(list -> {
-            // 結果をTODO一覧画面に反映
+            // 結果をビューに反映
             model.addAttribute("list", list);
             return "todo/todoList";
         });

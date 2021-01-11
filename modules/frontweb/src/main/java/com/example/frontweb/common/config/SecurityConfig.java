@@ -1,10 +1,11 @@
-package com.example.frontweb.config;
+package com.example.frontweb.common.config;
 
 import java.net.URI;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.client.oidc.web.server.logout.OidcClientInitiatedServerLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
@@ -20,11 +21,9 @@ public class SecurityConfig {
         // 認可設定
         http.authorizeExchange()
                 .pathMatchers("/").permitAll()
-                // .pathMatchers("/logout").permitAll() TODO logout は書かなくてもOK？
                 .anyExchange().authenticated();
 
         // OAuth2 Client
-        // TODO これあるべき？不要？
         http.oauth2Client();
 
         // OAuth2 ログイン
@@ -32,7 +31,7 @@ public class SecurityConfig {
 
         // ログアウト
         http.logout(logout -> {
-            var logoutSuccessHandler = new MyOidcClientInitiatedServerLogoutSuccessHandler(
+            var logoutSuccessHandler = new OidcClientInitiatedServerLogoutSuccessHandler(
                     clientRegistrationRepository);
             logoutSuccessHandler.setLogoutSuccessUrl(URI.create("/"));
             logoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}/");

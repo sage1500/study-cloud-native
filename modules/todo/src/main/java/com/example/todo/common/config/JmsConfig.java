@@ -1,10 +1,10 @@
-package com.example.todo.config;
+package com.example.todo.common.config;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.todo.app.notifier.TodoChangeEvent;
+import com.example.todo.app.TodoChangeEvent;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

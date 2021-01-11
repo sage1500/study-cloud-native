@@ -1,4 +1,4 @@
-package com.example.frontweb.common;
+package com.example.frontweb.common.filter;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -18,11 +18,11 @@ public class WebClientLoggingFilter implements ExchangeFilterFunction {
             // Before
             log.info("[WEB-CLIENT]REQUEST: {} {}", request.method(), request.url());
         }).then(call).doOnSuccess(done -> {
-            // after (success)
+            // After (success)
             log.info("[WEB-CLIENT]SUCCESS: statusCode={}", done.statusCode());
         }).doOnError(throwable -> {
-            // after (with error)
-            log.info("[WEB-CLIENT]ERROR: {}", throwable, throwable.getMessage());
+            // After (error)
+            log.error("[WEB-CLIENT]ERROR: {}", throwable, throwable.getMessage());
         }));
     }
 }

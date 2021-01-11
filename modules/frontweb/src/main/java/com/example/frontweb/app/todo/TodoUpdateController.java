@@ -1,4 +1,4 @@
-package com.example.frontweb.controller.todo;
+package com.example.frontweb.app.todo;
 
 import com.example.api.frontweb.client.api.TodosApi;
 import com.example.api.frontweb.client.model.TodoResource;
@@ -40,8 +40,6 @@ public class TodoUpdateController {
 
         // API呼出し
         return todosApi.showTodoById(todoForm.getTodoId()).map(todo -> {
-            // TODO ★セッションに正しく保存されているか確認
-
             // API呼出し結果を TodoForm に反映
             dozerMapper.map(todo, todoForm);
             return "todo/todoUpdateInput";

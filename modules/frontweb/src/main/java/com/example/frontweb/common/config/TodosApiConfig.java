@@ -1,8 +1,8 @@
-package com.example.frontweb.config;
+package com.example.frontweb.common.config;
 
 import com.example.api.frontweb.client.api.TodosApi;
 import com.example.api.frontweb.client.invoker.ApiClient;
-import com.example.frontweb.common.WebClientLoggingFilter;
+import com.example.frontweb.common.filter.WebClientLoggingFilter;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -21,23 +21,7 @@ import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class BackConfig {
-    @Bean
-    public WebClient webClientForHello(ReactiveClientRegistrationRepository clientRegistrations,
-            ServerOAuth2AuthorizedClientRepository authorizedClients, WebClientLoggingFilter loggingFilter) {
-        var oauth = new ServerOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrations, authorizedClients);
-
-        oauth.setDefaultOAuth2AuthorizedClient(true);
-        oauth.setDefaultClientRegistrationId("keycloak");
-
-        // @formatter:off
-        return WebClient.builder()
-                .baseUrl("http://localhost:8081/hello")
-                .filter(oauth)
-                .filter(loggingFilter)
-                .build();
-        // @formatter:on
-    }
+public class TodosApiConfig {
 
     @Bean
     public WebClient webClientForTodo(ReactiveClientRegistrationRepository clientRegistrations,
@@ -60,31 +44,11 @@ public class BackConfig {
     }
 
     @Bean
-    public WebClient webClientForTodo2(ReactiveClientRegistrationRepository clientRegistrations,
-            ServerOAuth2AuthorizedClientRepository authorizedClients) {
-        var oauth = new ServerOAuth2AuthorizedClientExchangeFilterFunction(clientRegistrations, authorizedClients);
-
-        oauth.setDefaultOAuth2AuthorizedClient(true);
-        oauth.setDefaultClientRegistrationId("keycloak");
-
-        // @formatter:off
-        return WebClient.builder()
-                .baseUrl("http://localhost:8082/todos")
-                .filter(oauth)
-                .build();
-        // @formatter:on
-    }
-
-    @Bean
-    public WebClient webClient() {
-        return WebClient.builder().build();
-    }
-
-    @Bean
     public TodosApi todosApi(@Qualifier("webClientForTodo") WebClient webClient) {
         var clientProto = new ApiClient();
-        ApiClient apiClient = new ApiClient(webClient, null, clientProto.getDateFormat());
+        var apiClient = new ApiClient(webClient, null, clientProto.getDateFormat());
         apiClient.setBasePath("http://localhost:8082");
+        
         var api = new TodosApi(apiClient);
         return api;
     }

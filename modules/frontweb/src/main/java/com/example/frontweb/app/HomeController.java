@@ -1,4 +1,4 @@
-package com.example.frontweb.controller;
+package com.example.frontweb.app;
 
 import com.example.api.frontweb.client.api.TodosApi;
 
@@ -35,7 +35,7 @@ public class HomeController {
                     var hello = results.getT1();
                     var todoList = results.getT2();
 
-                    // 結果をビューに反映
+                    // 複数のAPIの結果をビューに反映
                     model.addAttribute("hello", hello);
                     model.addAttribute("todoList", todoList);
 
