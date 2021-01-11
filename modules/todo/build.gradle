@@ -77,7 +77,6 @@ test {
 // OpenAPI
 task buildTodoServer(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
     generatorName = "spring"
-    //configFile = "$projectDir/src/main/spec/todo-server-config.json"
     inputSpec = "$projectDir/src/main/spec/todo.yml"
     outputDir = "$buildDir/generated"
 	modelNameSuffix = "Resource"
@@ -89,7 +88,6 @@ task buildTodoServer(type: org.openapitools.generator.gradle.plugin.tasks.Genera
 		java8: 'true',
 		reactive: 'true',
 		interfaceOnly: 'true',
-		//unhandledException: 'true',
 	]
     systemProperties = [
         modelDocs: 'false'
