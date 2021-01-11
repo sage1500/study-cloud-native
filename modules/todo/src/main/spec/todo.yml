@@ -1,0 +1,158 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Todo API
+servers:
+  - url: http://localhost
+paths:
+  /todos:
+    get:
+      operationId: listTodos
+      tags:
+        - todos
+      responses:
+        '200':
+          description: TODO一覧
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todos"
+        #default:
+        '500':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: createTodo
+      tags:
+        - todos
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Todo"
+      responses:
+        '201':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /todos/{todoId}:
+    get:
+      operationId: showTodoById
+      tags:
+        - todos
+      parameters:
+        - name: todoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      operationId: updateTodo
+      tags:
+        - todos
+      parameters:
+        - name: todoId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Todo"
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Todo"
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteTodo
+      tags:
+        - todos
+      parameters:
+        - name: todoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: boolean
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    Todo:
+      type: object
+      required:
+         - todoTitle
+      properties:
+        todoId:
+          type: string
+        todoTitle:
+          type: string
+        finished:
+          type: boolean
+        createdAt:
+          type: string
+          format: date
+        version:
+          type: integer
+          format: int64
+    Todos:
+      type: array
+      items:
+        $ref: "#/components/schemas/Todo"
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string

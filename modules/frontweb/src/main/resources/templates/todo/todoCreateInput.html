@@ -1,0 +1,25 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>TODO新規作成</title>
+    <link th:href="@{/css/content.css}" rel="stylesheet">
+</head>
+
+<body>
+    <h2>TODO新規作成</h2>
+    <form th:action="@{/todo/create/confirm}" th:method="post" th:object="${todoForm}">
+        <table>
+            <tr>
+                <td>件名</td>
+                <td><input type="text" th:field="*{todoTitle}"></td>
+            </tr>
+        </table>
+        <button onclick="document.cancelForm.submit(); return false;">キャンセル</button>
+        <button>確認</button>
+    </form>
+    <form th:action="@{/todo/create/cancel}" name="cancelForm"></form>
+</body>
+
+</html>

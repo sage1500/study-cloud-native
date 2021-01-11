@@ -1,0 +1,18 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Home Page</title>
+    <link th:href="@{/css/content.css}" rel="stylesheet">
+</head>
+
+<body>
+    <span th:text="${hello}"></span>
+    <form th:action="@{/logout}" method="post" style="display: inline">
+        <button type="submit">ログアウト</button>
+    </form>
+    <hr>
+    Test Home
+</body>
+
+</html>

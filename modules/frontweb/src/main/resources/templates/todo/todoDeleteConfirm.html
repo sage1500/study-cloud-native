@@ -1,0 +1,32 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>確認 - TODO削除</title>
+    <link th:href="@{/css/content.css}" rel="stylesheet">
+</head>
+
+<body>
+    <h2>確認 - TODO削除</h2>
+
+    <div class="confirm">
+        以下の内容を削除します。
+
+        <table th:object="${todoForm}">
+            <tr>
+                <td>件名</td>
+                <td th:text="*{todoTitle}"></td>
+            </tr>
+        </table>
+    </div>
+
+    <form th:action="@{/todo/delete/cancel}">
+        <button>キャンセル</button>
+    </form>
+    <form th:action="@{/todo/delete/execute}" th:method="post">
+        <button>削除</button>
+    </form>
+</body>
+
+</html>

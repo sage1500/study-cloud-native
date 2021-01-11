@@ -1,0 +1,22 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>完了 - TODO削除</title>
+    <link th:href="@{/css/content.css}" rel="stylesheet">
+</head>
+
+<body>
+    <h2>完了 - TODO削除</h2>
+
+    <div class="complete">
+        <span th:text="${message}"></span>
+    </div>
+
+    <form th:action="@{/todo/}">
+        <button>一覧に戻る</button>
+    </form>
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Sample Top Page</title>
+</head>
+
+<body>
+    <h1 th:text="|Sample Top Page|"></h1>
+
+    <form th:action="@{/home}" method="get">
+        <button>開始</button>
+    </form>
+</body>
+
+</html>
