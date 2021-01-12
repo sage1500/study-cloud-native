@@ -77,7 +77,7 @@
 
 #### KeyCloak の設定
 
-KeyCloak の設定は作成手順。
+KeyCloak の設定の作成手順。
 
 - 管理画面: `http://localhost:18080/auth/admin/` ※ID/PW=keycloak/keycloak
 - 以下を作成
