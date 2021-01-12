@@ -3,7 +3,7 @@
 ## デモアプリ
 ### 環境構築
 
-1. 各ミドルウェア起動  
+1. ミドルウェア起動  
     `docker\up-all.bat` を実行する。  
       
     以下、参考情報。  
@@ -15,11 +15,18 @@
         - scnkeycloak/
         - scnredis/
         - scnactivemq/
-1. db のスキーマ設定  
-    - スキーマのファイル: `modules\todo\src\main\resources\schema-postgresql.sql`
-    - psql を実行するバッチファイル: `docker\scndb\db-cli.bat`  
-      ※実行時にパスワードを聞かれたら postgres と入力
-
+1. ミドルウェア起動確認（オプション）
+    1. PostgreSQL  
+        `docker\scndb\db-cli.bat` を実行して、DBに接続できるか確認する。   
+        ※パスワードは postgres。プロンプトを終了するには `\q` + ENTER をタイプする。 
+    1. Redis  
+        `docker\scnredis\redis-cli.bat` を実行して、Redis に接続できるか確認する。  
+        ※プロンプトを終了するには `exit` + ENTER をタイプする。 
+    1. KeyCloak  
+        http://localhost:18080/ にアクセスして、KeyCloak の画面が表示されることを確認する。
+    1. ActiveMQ  
+        http://localhost:8161/ にアクセスして、ActiveMQ の画面が表示されることを確認する。
+     
 ### 実行
 
 4つのコンソールから以下のコマンドをそれぞれ実行する。
@@ -34,7 +41,7 @@
 ### 動作確認
 #### 画面から確認
 
-- `http://localhost:8080/` にアクセスする。  
+- http://localhost:8080/ にアクセスする。  
     ユーザのID/PWは以下のものから選ぶ
     - user1/user1
     - user2/user2
@@ -64,8 +71,7 @@
     - scnactivemq/
 
 ### TODO(デモアプリ)
-- 環境
-    - PostgreSQL のスキーマは自動で作成するように
+
 - デモアプリ
     - クラウドネイティブ・アプリケーションと直接絡まない部分
         - バリデーション
