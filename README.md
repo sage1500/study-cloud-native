@@ -4,8 +4,12 @@
 ### 環境構築
 
 1. 各ミドルウェア起動  
-    以下のディレクトリ配下の `docker-compose.yml` を `docker-compose up -d` で
-    それぞれ起動する。
+    `docker\up-all.bat` を実行する。  
+      
+    以下、参考情報。  
+    上記のコマンドは、以下のディレクトリ配下の `docker-compose.yml` を `docker-compose up -d` で
+    それぞれ起動している。
+    そのため、`docker\up-all.bat` を実行する代わりに、個別に `docker-compose up -d` を実行してもよい。
     - docker/
         - scndb/
         - scnkeycloak/
@@ -15,20 +19,6 @@
     - スキーマのファイル: `modules\todo\src\main\resources\schema-postgresql.sql`
     - psql を実行するバッチファイル: `docker\scndb\db-cli.bat`  
       ※実行時にパスワードを聞かれたら postgres と入力
-1. KeyCloakの設定
-    - 管理画面: `http://localhost:18080/auth/admin/` ※ID/PW=keycloak/keycloak
-    - 以下を作成
-        - レルム: demo
-        - クライアント:
-            - 名前: demoapp
-            - アクセスタイプ: confidential
-            - 有効なリダイレクトURI
-                - `http://localhost:8080/login/oauth2/code/*`
-                - `http://localhost:8080/`
-            - シークレットの値をメモして置き、以下に反映
-                - ファイル: `modules\frontweb\src\main\resources\application.properties`
-                - プロパティ: `spring.security.oauth2.client.registration.keycloak.client-secret`
-        - ユーザ: 適当に2ユーザ以上作成する
 
 ### 実行
 
@@ -44,8 +34,10 @@
 ### 動作確認
 #### 画面から確認
 
-- `http://localhost:8080/` にアクセスする。
-    ユーザのID/PWは環境設定で作成したユーザのものを使用する。
+- `http://localhost:8080/` にアクセスする。  
+    ユーザのID/PWは以下のものから選ぶ
+    - user1/user1
+    - user2/user2
 - 適当に操作して、TODOをいくつか表示してみる。
 - 以下を確認してみる。
     - ホーム画面に、`Hello <ユーザID>` と TODOの一覧が表示されること。
@@ -62,8 +54,8 @@
 > curl.exe -v http://localhost:8083/manage/health
 ```
 
-以下のディレクトリ配下の `docker-compose.yml` を `docker-compose down` で
-それぞれ落とした後に上記コマンドを実行するとどうなるか確認する。
+以下のディレクトリ配下の `docker-compose.yml` を `docker-compose down` を実行し、
+各コンテナを落とした後に上記コマンドを実行するとどうなるか確認する。
 
 - docker/
     - scndb/
@@ -73,10 +65,32 @@
 
 ### TODO(デモアプリ)
 - 環境
-    - KeyCloak のレルム等の作成は事前に作成したものを使えるように
     - PostgreSQL のスキーマは自動で作成するように
 - デモアプリ
     - クラウドネイティブ・アプリケーションと直接絡まない部分
         - バリデーション
         - メッセージ外部化
     - dockerイメージ作成をビルドファイルに組み込み
+
+
+### 参考
+
+#### KeyCloak の設定
+
+KeyCloak の設定は作成手順。
+
+- 管理画面: `http://localhost:18080/auth/admin/` ※ID/PW=keycloak/keycloak
+- 以下を作成
+    - レルム: demo
+    - クライアント:
+        - 名前: demoapp
+        - アクセスタイプ: confidential
+        - 有効なリダイレクトURI
+            - `http://localhost:8080/login/oauth2/code/*`
+            - `http://localhost:8080/`
+        - シークレットの値をメモして置き、以下に反映
+            - ファイル: `modules\frontweb\src\main\resources\application.properties`
+            - プロパティ: `spring.security.oauth2.client.registration.keycloak.client-secret`
+    - ユーザ: 以下の2ユーザ(ID/PW)を作成する。
+        - user1/user1
+        - user2/user2
