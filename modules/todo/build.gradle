@@ -57,6 +57,10 @@ dependencies {
 	runtimeOnly 'io.r2dbc:r2dbc-postgresql'
 	runtimeOnly 'org.postgresql:postgresql'
 
+	// Flyway
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.springframework:spring-jdbc'
+
 	// Spring JMS (ActiveMQ)
 	implementation 'org.springframework:spring-jms'
 	implementation 'jakarta.jms:jakarta.jms-api'
