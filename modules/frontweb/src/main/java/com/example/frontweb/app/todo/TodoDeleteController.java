@@ -1,8 +1,11 @@
 package com.example.frontweb.app.todo;
 
+import java.util.Locale;
+
 import com.example.api.frontweb.client.api.TodosApi;
 import com.github.dozermapper.core.Mapper;
 
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +27,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Slf4j
 public class TodoDeleteController {
+    private final MessageSource messageSource;
     private final TodosApi todosApi;
     private final Mapper dozerMapper;
 
@@ -56,7 +60,9 @@ public class TodoDeleteController {
         return todosApi.deleteTodo(todoForm.getTodoId())
             .map(result -> {
                 log.debug("[TODO-DELETE]result: {}", result);
-                String msg = (result) ? "削除しました。" : "削除済でした。";
+
+                String msgKey =  (result) ? "message.todo.delete.success" : "message.todo.delete.success-deleted";
+                String msg = messageSource.getMessage(msgKey, null, Locale.ROOT);
                 return Rendering.redirectTo("complete?message={message}").modelAttribute("message", msg).build();
             });
         // @formatter:on

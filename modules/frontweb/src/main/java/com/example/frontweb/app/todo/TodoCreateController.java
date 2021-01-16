@@ -1,11 +1,18 @@
 package com.example.frontweb.app.todo;
 
+import java.util.Locale;
+
+import javax.validation.groups.Default;
+
 import com.example.api.frontweb.client.api.TodosApi;
 import com.example.api.frontweb.client.model.TodoResource;
 import com.github.dozermapper.core.Mapper;
 
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +33,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Slf4j
 public class TodoCreateController {
+    private final MessageSource messageSource;
     private final TodosApi todosApi;
     private final Mapper dozerMapper;
 
@@ -51,8 +59,14 @@ public class TodoCreateController {
     }
 
     @PostMapping("confirm")
-    public String confirm(TodoForm todoForm) {
+    public String confirm(@Validated({ Default.class, TodoForm.TodoCreate.class }) TodoForm todoForm,
+            BindingResult bindingResult) {
         log.debug("[TODO-CREATE]confirm: {}", todoForm);
+
+        if (bindingResult.hasErrors()) {
+            return input(todoForm);
+        }
+
         return "todo/todoCreateConfirm";
     }
 
@@ -74,7 +88,7 @@ public class TodoCreateController {
                 dozerMapper.map(result, todoForm);
 
                 // 完了画面にリダイレクト
-                String msg = "作成しました。";
+                String msg = messageSource.getMessage("message.todo.create.success", null, Locale.ROOT);
                 return Rendering.redirectTo("complete?message={message}").modelAttribute("message", msg).build();
             });
         // @formatter:on

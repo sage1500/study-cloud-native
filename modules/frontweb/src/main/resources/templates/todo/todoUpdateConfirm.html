@@ -3,32 +3,32 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>確認 - TODO更新</title>
+    <title th:text="#{todo.update.confirm.title}">Confirm - Update TODO</title>
     <link th:href="@{/css/content.css}" rel="stylesheet">
 </head>
 
 <body>
-    <h2>確認 - TODO更新</h2>
+    <h2 th:text="#{todo.update.confirm.title}">Confirm - Update TODO</h2>
 
     <div class="confirm">
-        以下の内容に更新します。
+        <span th:text="#{message.todo.update.confirm}"></span>
 
         <table th:object="${todoForm}">
             <tr>
-                <td>件名</td>
+                <td th:text="#{todo.common.title}">Title</td>
                 <td th:text="*{todoTitle}"></td>
             </tr>
         </table>
     </div>
 
     <form th:action="@{/todo/update/cancel}">
-        <button>キャンセル</button>
+        <button th:text="#{common.cancel}">Cancel</button>
     </form>
     <form th:action="@{/todo/update/input}" th:method="post">
-        <button>再入力</button>
+        <button th:text="#{todo.common.re-input}">Re input</button>
     </form>
     <form th:action="@{/todo/update/execute}" th:method="post">
-        <button>更新</button>
+        <button th:text="#{todo.update.confirm.execute}">Execute</button>
     </form>
 </body>
 

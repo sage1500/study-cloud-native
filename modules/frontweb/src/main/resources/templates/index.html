@@ -3,14 +3,14 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Sample Top Page</title>
+    <title th:text="#{index.title}">Title</title>
 </head>
 
 <body>
-    <h1 th:text="|Sample Top Page|"></h1>
+    <h1 th:text="#{index.title}"></h1>
 
     <form th:action="@{/home}" method="get">
-        <button>開始</button>
+        <button th:text="#{index.enter}">Enter</button>
     </form>
 </body>
 
