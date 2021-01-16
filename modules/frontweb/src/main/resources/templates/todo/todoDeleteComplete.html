@@ -3,19 +3,19 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>完了 - TODO削除</title>
+    <title th:title="#{todo.delete.complete.title}">Complete - Delete TODO</title>
     <link th:href="@{/css/content.css}" rel="stylesheet">
 </head>
 
 <body>
-    <h2>完了 - TODO削除</h2>
+    <h2 th:title="#{todo.delete.complete.title}">Complete - Delete TODO</h2>
 
     <div class="complete">
         <span th:text="${message}"></span>
     </div>
 
     <form th:action="@{/todo/}">
-        <button>一覧に戻る</button>
+        <button th:text="#{todo.common.return-to-list}">Return to list</button>
     </form>
 </body>
 

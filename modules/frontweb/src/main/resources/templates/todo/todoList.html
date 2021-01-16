@@ -3,25 +3,25 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>TODO一覧</title>
+    <title th:text="#{todo.list.title}">List TODO</title>
     <link th:href="@{/css/content.css}" rel="stylesheet">
 </head>
 
 <body>
     <form th:action="@{/home}">
-        <button>ホーム</button>
+        <button th:text="#{common.home}">Home</button>
     </form>
     <hr>
-    <h2>TODO一覧</h2>
+    <h2 th:text="#{todo.list.title}">List TODO</h2>
 
     <form th:action="@{/todo/create/}">
-        <button>新規追加</button>
+        <button th:text="#{todo.list.add-new}">Add New</button>
     </form>
 
     <hr>
     <table class="todo-list">
         <tr>
-            <th>件名</th>
+            <th th:text="#{todo.common.title}">Title</th>
             <th></th>
         </tr>
         <tr th:each="todo : ${list}">
@@ -29,11 +29,11 @@
             <td>
                 <form th:action="@{/todo/update/}" th:method="post">
                     <input type="hidden" name="todoId" th:value="${todo.todoId}">
-                    <button>変更</button>
+                    <button th:text="#{todo.list.update}">Update</button>
                 </form>
                 <form th:action="@{/todo/delete/}" th:method="post">
                     <input type="hidden" name="todoId" th:value="${todo.todoId}">
-                    <button>削除</button>
+                    <button th:text="#{todo.list.delete}">Delete</button>
                 </form>
             </td>
         </tr>

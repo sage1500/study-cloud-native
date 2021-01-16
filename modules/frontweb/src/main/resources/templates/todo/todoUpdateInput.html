@@ -3,22 +3,21 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>TODO更新</title>
+    <title th:text="#{todo.update.input.title}">Update TODO</title>
     <link th:href="@{/css/content.css}" rel="stylesheet">
 </head>
 
 <body>
-    <h2>TODO更新</h2>
+    <h2 th:text="#{todo.update.input.title}">Update TODO</h2>
 
-    <form th:action="@{/todo/update/confirm}" th:method="post" th:object="${todoForm}">
-        <table>
-            <tr>
-                <td>件名</td>
-                <td><input type="text" th:field="*{todoTitle}"></td>
-            </tr>
-        </table>
-        <button onclick="document.cancelForm.submit(); return false;">キャンセル</button>
-        <button>確認</button>
+    <form th:action="@{/todo/update/confirm}" th:method="post" th:object="${todoForm}" class="form-horizontal">
+        <label th:for="todoTitle" name="todoTitle" th:errorclass="error-label" th:text="#{todo.common.title}">Title</label>
+        <input type="text" th:field="*{todoTitle}" th:errorclass="error-input">
+        <span th:errors="*{todoTitle}" class="error-messages"></span>
+        <br>
+
+        <button onclick="document.cancelForm.submit(); return false;" th:text="#{common.cancel}">Cancel</button>
+        <button th:text="#{todo.common.confirm}">Confirm</button>
     </form>
     <form th:action="@{/todo/update/cancel}" name="cancelForm"></form>
 </body>

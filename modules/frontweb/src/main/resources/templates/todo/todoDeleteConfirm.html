@@ -3,29 +3,29 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>確認 - TODO削除</title>
+    <title th:text="#{todo.delete.confirm.title}">Confirm - Delete TODO</title>
     <link th:href="@{/css/content.css}" rel="stylesheet">
 </head>
 
 <body>
-    <h2>確認 - TODO削除</h2>
+    <h2 th:text="#{todo.delete.confirm.title}">Confirm - Delete TODO</h2>
 
     <div class="confirm">
-        以下の内容を削除します。
+        <span th:text="#{message.todo.delete.confirm}"></span>
 
         <table th:object="${todoForm}">
             <tr>
-                <td>件名</td>
+                <td th:text="#{todo.common.title}">Title</td>
                 <td th:text="*{todoTitle}"></td>
             </tr>
         </table>
     </div>
 
     <form th:action="@{/todo/delete/cancel}">
-        <button>キャンセル</button>
+        <button th:text="#{common.cancel}">Cancel</button>
     </form>
     <form th:action="@{/todo/delete/execute}" th:method="post">
-        <button>削除</button>
+        <button th:text="#{todo.delete.confirm.execute}">Execute</button>
     </form>
 </body>
 

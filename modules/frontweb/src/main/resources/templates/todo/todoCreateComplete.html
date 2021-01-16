@@ -3,34 +3,34 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>完了 - TODO新規作成</title>
+    <title th:text="#{todo.create.complete.title}">Complete - Add New TODO</title>
     <link th:href="@{/css/content.css}" rel="stylesheet">
 </head>
 
 <body>
-    <h2>完了 - TODO新規作成</h2>
+    <h2 th:text="#{todo.create.complete.title}">Complete - Add New TODO</h2>
 
     <div class="complete">
         <span th:text="${message}"></span>
 
         <table th:object="${todoForm}">
             <tr>
-                <td>ID</td>
+                <td th:text="#{todo.common.id}">ID</td>
                 <td th:text="*{todoId}"></td>
             </tr>
             <tr>
-                <td>件名</td>
+                <td th:text="#{todo.common.title}">Title</td>
                 <td th:text="*{todoTitle}"></td>
             </tr>
             <tr>
-                <td>バージョン</td>
+                <td th:text="#{todo.common.version}">Version</td>
                 <td th:text="*{version}"></td>
             </tr>
         </table>
     </div>
 
     <form th:action="@{/todo/}">
-        <button>一覧に戻る</button>
+        <button th:text="#{todo.common.return-to-list}">Return to list</button>
     </form>
 </body>
 

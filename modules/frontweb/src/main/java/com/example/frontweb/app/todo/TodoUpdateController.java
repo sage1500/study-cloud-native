@@ -1,11 +1,18 @@
 package com.example.frontweb.app.todo;
 
+import java.util.Locale;
+
+import javax.validation.groups.Default;
+
 import com.example.api.frontweb.client.api.TodosApi;
 import com.example.api.frontweb.client.model.TodoResource;
 import com.github.dozermapper.core.Mapper;
 
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +33,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @Slf4j
 public class TodoUpdateController {
+    private final MessageSource messageSource;
     private final TodosApi todosApi;
     private final Mapper dozerMapper;
 
@@ -53,8 +61,14 @@ public class TodoUpdateController {
     }
 
     @PostMapping("confirm")
-    public String confirm(TodoForm todoForm) {
+    public String confirm(@Validated({ Default.class, TodoForm.TodoUpdate.class }) TodoForm todoForm,
+            BindingResult bindingResult) {
         log.debug("[TODO-UPDATE]confirm: {}", todoForm);
+
+        if (bindingResult.hasErrors()) {
+            return input(todoForm);
+        }
+
         return "todo/todoUpdateConfirm";
     }
 
@@ -74,7 +88,8 @@ public class TodoUpdateController {
                 // API呼出し結果を TodoForm に反映 
                 dozerMapper.map(result, todoForm);
 
-                return Rendering.redirectTo("complete?message={message}").modelAttribute("message", "更新しました。").build();
+                String msg = messageSource.getMessage("message.todo.update.success", null, Locale.ROOT);
+                return Rendering.redirectTo("complete?message={message}").modelAttribute("message", msg).build();
             });
         // @formatter:on
     }
