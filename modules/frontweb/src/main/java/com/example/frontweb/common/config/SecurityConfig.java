@@ -8,6 +8,7 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.client.oidc.web.server.logout.OidcClientInitiatedServerLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 
 @EnableWebFluxSecurity
 public class SecurityConfig {
@@ -15,8 +16,9 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
             ReactiveClientRegistrationRepository clientRegistrationRepository) {
-        // TODO WebFlux で CSRF がまともに動かない？
-        http.csrf().disable();
+        // CSRF対策
+        // ※CSRFトークンを Cookieに保持
+        http.csrf().csrfTokenRepository(new CookieServerCsrfTokenRepository());
 
         // 認可設定
         // @formatter:off
