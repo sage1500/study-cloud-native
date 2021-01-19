@@ -8,15 +8,15 @@ Spring Security
 - BFF のパターンで、BFFをクライアント、APIサーバをリソースサーバとして扱うことに意味はあるのか？
   - BFF がリソースサーバなのでは？
 
-### memo
-
 ### 参考文献
+
 - WebFlux での OAuth
   - https://spring.pleiades.io/spring-security/site/docs/current/reference/html5/#reactive-applications
 
-#### クライアント実装
 
-##### 依存関係
+### クライアント実装
+
+#### 依存関係
 
 ```groovy
 implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
@@ -25,7 +25,7 @@ implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 この依存関係を書くだけで、URLアクセス時にログイン画面が表示されるようになる。
 ただ、特に認証情報を用意していないので、その先に進めない。
 
-##### プロパティ(google)
+#### プロパティ(google)
 
 Google の最小設定。
 
@@ -120,8 +120,9 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
             ReactiveClientRegistrationRepository clientRegistrationRepository) {
-        // TODO WebFlux で CSRF がまともに動かない？
-        http.csrf().disable();
+        // CSRF対策
+        // ※CSRFトークンを Cookieに保持
+        http.csrf().csrfTokenRepository(new CookieServerCsrfTokenRepository());
 
         // 認可設定
         http.authorizeExchange()
@@ -224,6 +225,38 @@ WebClient のBean定義。
         return body.map(m -> m + ":" + "hello " + new Date());
     }
 ```
+
+#### CSRF対策
+
+以下のコードを追加することで
+Thymeleaf が CSRF対策に対応したHTMLを出力するようになる。
+逆の言い方をすれば、以下のコードを追加せずに、CSRF対策を有効にすると（Spring SecurityのデフォルトはCSRFは有効）、
+POSTでの画面遷移時に CSRF対策のチェックでNGになってしまうので注意。
+
+```java
+import org.springframework.security.web.reactive.result.view.CsrfRequestDataValueProcessor;
+import org.springframework.security.web.server.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.server.ServerWebExchange;
+
+import reactor.core.publisher.Mono;
+
+@ControllerAdvice
+public class SecurityControllerAdvice {
+    @ModelAttribute
+    public Mono<CsrfToken> csrfToken(ServerWebExchange exchange) {
+        Mono<CsrfToken> csrfToken = exchange.getAttribute(CsrfToken.class.getName());
+        return csrfToken.doOnSuccess(
+                token -> exchange.getAttributes().put(CsrfRequestDataValueProcessor.DEFAULT_CSRF_ATTR_NAME, token));
+    }
+}
+```
+
+以下、2つはパッケージ違いの同名クラスがあるので注意
+- `org.springframework.security.web.reactive.result.view.CsrfRequestDataValueProcessor`
+- `org.springframework.security.web.server.csrf.CsrfToken`
+
 
 ### リソースサーバ実装
 
