@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.result.view.Rendering;
 
 import lombok.RequiredArgsConstructor;
@@ -90,6 +91,12 @@ public class TodoUpdateController {
 
                 String msg = messageSource.getMessage("message.todo.update.success", null, Locale.ROOT);
                 return Rendering.redirectTo("complete?message={message}").modelAttribute("message", msg).build();
+            })
+            // 更新が競合した場合
+            .onErrorResume(WebClientResponseException.Conflict.class, e -> {
+                log.debug("[TODO-UPDATE]update failed: {}", e.getMessage());
+                String msg = messageSource.getMessage("message.todo.update.failed-conflict", null, Locale.ROOT);
+                return Mono.just(Rendering.redirectTo("complete?message={message}").modelAttribute("message", msg).build());
             });
         // @formatter:on
     }
