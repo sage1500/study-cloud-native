@@ -7,6 +7,8 @@ import com.example.api.todo.server.model.TodoResource;
 import com.example.todo.domain.entity.Todo;
 import com.example.todo.domain.service.TodoService;
 
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -86,7 +88,12 @@ public class TodoController implements TodosApi {
                 var jwt = t.getT1().getToken();
                 var rsrc = t.getT2();
                 return todoService.save(toTodo(rsrc, todoId, jwt));
-            }).map(todo -> ResponseEntity.ok(toTodoResource(todo)));
+            }).map(todo -> ResponseEntity.ok(toTodoResource(todo)))
+            // 楽観的ロックNGの場合
+            .onErrorResume(OptimisticLockingFailureException.class, e -> {
+                log.error("[TODO]楽観的ロックNG: {}", e.getMessage());   
+                return Mono.just(ResponseEntity.status(HttpStatus.CONFLICT).build());
+            });
         // @formatter:on
     }
 
