@@ -21,6 +21,10 @@ Spring Data R2DBC
 https://github.com/spring-projects/spring-data-jdbc/issues/771
 
 
+加えて、delete に失敗しても、例外がスローされない。
+そのため、削除できてかどうかを判定しようと思うならば、
+現時点では、Spring Data JDBC は使えない。
+
 ### Spring Data JPA
 
 - Entity に `javax.persistence.Entity` アノテーションの付与が必要
