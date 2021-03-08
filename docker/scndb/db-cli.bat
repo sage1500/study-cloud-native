@@ -1,2 +1,2 @@
-docker run -it --rm --network scndb_default postgres psql -h db -U postgres
+docker run -it --rm --network scndb_default postgres:13.1-alpine psql -h db -U postgres
 
