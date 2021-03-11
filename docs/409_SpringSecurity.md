@@ -1,14 +1,12 @@
 Spring Security
 ===
 
-TODO 書きかけ
-
-
 ここでは、Spring Security + WebFlux を利用して
 OAuth & OpenID Connect による認証・認可の実装方法について紹介する。
 
 なお、WebFlux を利用した場合の Spring Security の利用方法は、
 WebFlux を利用しない場合とだいぶ異なることに注意。
+（Web で Spring Security を調査する場合は、それが SpringMVC用に書かれているのか、WebFlux用に書かれているのか見極めが必要）
 
 ## 概要
 OAuth の概要については以下参照。
@@ -22,6 +20,7 @@ http://terasolunaorg.github.io/guideline/5.6.1.RELEASE/ja/Security/OAuth.html
 OAuth 2.0 が定義するロールについて。
 ここでいうロールとはユーザのロール（管理者や一般ユーザ）のことではなく、
 プロトコルのシーケンス上に現れるライフライン（アクターやサーバ）のことを指す。
+ロールには以下のものがある。
 
 - リソースオーナ  
     人のことだと思っておけばよい。
@@ -37,8 +36,8 @@ OAuth 2.0 が定義するロールについて。
 - 認可サーバ  
     KeyCloak のことと思っておけばよい。
 
-今回、Javaで実装するのは、上記のうち、
-リソースサーバと、コンフィデンシャルクライアントの 2つ。
+今回、Javaで実装するロール（ノード）は、上記のうち、
+リソースサーバと、コンフィデンシャルクライアントの 2つである。
 
 ### アクセストークン
 
@@ -49,7 +48,7 @@ OAuth 2.0 が定義するロールについて。
 
 ### スコープ
 
-TODO
+ここでは触れない。
 
 ### 認可グラント
 
@@ -74,20 +73,53 @@ OAuth における認可は、リソースオーナーが認可するため、
 
 ### JWT
 
-JWT(ジョット)。
-アクセストークンのフォーマットは任意。
-今回は、アクセストークンに JWT を利用する。
+JWT(ジョット)。 JSON Web Token の略。
+アクセストークンのフォーマットは任意となっている。
+今回、アクセストークンのフォーマットに JWT を利用し、
+アクセストークンに紐付く情報をアクセストークン自体の中に埋め込む方法で実装する。
+
+参考) https://qiita.com/TakahikoKawasaki/items/970548727761f9e02bcd
 
 ## リソースサーバの実装
+
+### 依存関係
+
+OAuth2.0 のリソースサーバ用のスターターを依存関係に追加する。
 
 ```groovy
 implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 ```
 
+### `application.properties`
+
+お手軽な方法として、
+`spring.security.oauth2.resourceserver.jwt.issuer-uri` 
+だけを設定する方法を紹介する。
+
+KeyCloak の場合、`/auth/realms/レルム名` をパスに設定する。
+以下は、レルム名が demo の場合の設定例。
+
 ```
 spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:18080/auth/realms/demo
 ```
 
+なお、AP起動時に、このURLにアクセスし、その他必要な情報を取得するという仕組みになっている。
+そのため、AP起動時に、このURLへのアクセスできないと、APの起動が失敗する。
+（APを起動する前に、KeyCloakが先に起動している必要がある）
+
+### Java Config
+
+認証の設定を行う。
+大まかな実装方法は以下のとおり。
+
+- `@EnableWebFluxSecurity`(このアノテーションは`@Configuration`を含んでいる) を付与した Configクラスで
+    `SecurityWebFilterChain` のBean(Bean名は`springSecurityFilterChain`)を定義する。  
+    ※TODO 要確認：Bean名は何でもよい？
+- `SecurityWebFilterChain` の Bean生成時のポイント
+    - `http.authorizeExchange()` で認可設定する。通常、全パスで認証を要求する設定でよい。（後で、Spring Boot Actuator を使用するときに少し改変する予定）
+    - `http.oauth2ResourceServer().jwt()` でリソースサーバとしてJWTを使うように設定する。
+
+例）
 ```java
 @EnableWebFluxSecurity
 public class SecurityConfig {
@@ -96,7 +128,6 @@ public class SecurityConfig {
         // 認可設定
         // @formatter:off
         http.authorizeExchange()
-                .pathMatchers("/manage/**").permitAll()
                 .anyExchange().authenticated();
         // @formatter:on
 
@@ -107,44 +138,55 @@ public class SecurityConfig {
 }
 ```
 
-```java
-@GetMapping("/")
-public String hello(@AuthenticationPrincipal Jwt jwt) {
-    log.debug("[HELLO]hello jwt={}", jwt);
-    return "Hello " + jwt.getClaimAsString("preferred_username");
-}
-```
+### アクセストークン（JWT）の入手方法
 
-※FQCNに注意
-```java
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
-```
+- ハンドラメソッドを任意に定義できる場合  
+    ハンドラメソッドの引数に型 `@AuthenticationPrincipal Jwt` を指定することで、
+    JWTを入手することができる。
+    この JWT の `preferred_username`クレームからユーザ名を取得できる。
 
-```java
-@Override
-public Mono<ResponseEntity<TodoResource>> createTodo(@Valid Mono<TodoResource> todoResource,
-        ServerWebExchange exchange) {
-    // @formatter:off
-    return Mono.zip(
-            exchange.getPrincipal().cast(JwtAuthenticationToken.class),
-            todoResource)
-        .flatMap(t -> {
-            var jwt = t.getT1().getToken();
-            var rsrc = t.getT2();
-            String todoId = null;
-            return todoService.save(toTodo(rsrc, todoId, jwt));
-        })
-        .doOnNext(this::notifyCreateTodo)
-        .map(todo -> ResponseEntity.ok(toTodoResource(todo)));
-    // @formatter:on
-}
-```
+    ```java
+    @GetMapping("/")
+    public String hello(@AuthenticationPrincipal Jwt jwt) {
+        log.debug("[HELLO]hello jwt={}", jwt);
+        return "Hello " + jwt.getClaimAsString("preferred_username");
+    }
+    ```
 
-※FQCNに注意。間違えると実行時に `ClassCastException` が発生する。
-```java
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-```
+    ※FQCNに注意
+    ```java
+    import org.springframework.security.core.annotation.AuthenticationPrincipal;
+    import org.springframework.security.oauth2.jwt.Jwt;
+    ```
+- Open API Generator を使って生成したハンドラメソッドの場合  
+    生成されたハンドラメソッドには引数の `ServerWebExchange` が設定されている。
+    `ServerWebExchange.getPrincipal()` を呼び出すと、
+    `JwtAuthenticationToken` が取得でき、さらに `JwtAuthenticationToken.getToken()` にて JWT が取得できる。
+
+    ```java
+    @Override
+    public Mono<ResponseEntity<TodoResource>> createTodo(@Valid Mono<TodoResource> todoResource,
+            ServerWebExchange exchange) {
+        // @formatter:off
+        return Mono.zip(
+                exchange.getPrincipal().cast(JwtAuthenticationToken.class),
+                todoResource)
+            .flatMap(t -> {
+                var jwt = t.getT1().getToken();
+                var rsrc = t.getT2();
+                String todoId = null;
+                return todoService.save(toTodo(rsrc, todoId, jwt));
+            })
+            .doOnNext(this::notifyCreateTodo)
+            .map(todo -> ResponseEntity.ok(toTodoResource(todo)));
+        // @formatter:on
+    }
+    ```
+
+    ※FQCNに注意。間違えると実行時に `ClassCastException` が発生する。
+    ```java
+    import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+    ```
 
 ## コンフィデンシャルクライアントの実装
 
@@ -158,25 +200,60 @@ implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
 ### `application.properties`
 
-TODO
+Google などの有名どころを認証プロバイダとして利用する場合は、
+Spring Security にあらかじめ組み込まれているため、設定が非常に少なくてよい。
+
+KeyCloak の設定はデフォルトで組み込まれていないが、
+ここではお手軽に KeyCloak を認証プロバイダとして登録する方法を紹介する。
+
+認証プロバイダとして登録するお手軽な方法は、
+`spring.security.oauth2.client.provider.プロバイダ名.issuer-uri` だけを設定すること。
+KeyCloak の場合は、ここに `/auth/realms/レルム名` をパスに設定する。
+
+以下は、プロバイダ名を keycloak とし、レルム名が demo の場合の設定例。
+
+```
+spring.security.oauth2.client.provider.keycloak.issuer-uri=http://localhost:18080/auth/realms/demo
+```
+
+なお、AP起動時に、このURLにアクセスし、その他必要な情報を取得するという仕組みになっている。
+そのため、AP起動時に、このURLへのアクセスできないと、APの起動が失敗する。
+（APを起動する前に、KeyCloakが先に起動している必要がある）
+
+次に、
+`spring.security.oauth2.client.registration.クライアント名.XXXX` の各種プロパティで
+クライアントの情報を設定する。
+`XXXX` で最低限必要なものは以下のとおり。
+
+- `provider` : 上記で登録した認証プロバイダ名を設定
+- `client-id` : KeyCloak上で登録しているクライアントID
+- `client-secret` : KeyCloak上で登録しているクライアントシークレット
+- `scope` : `openid` を設定する。重要。これを設定しないと、ログアウト時に OIDC(OpenID Connect)としてログアウト処理が行われない。
+
+以下は、クライアント名が keycloak の場合の設定例。  
+※プロバイダ名とクライアント名が同じなので、わかりにくくて申し訳ない・・・
 
 ```
 spring.security.oauth2.client.registration.keycloak.provider=keycloak
 spring.security.oauth2.client.registration.keycloak.client-id=demoapp
 spring.security.oauth2.client.registration.keycloak.client-secret=08c33835-c18c-4dd7-a7df-aee3479d17c4
 spring.security.oauth2.client.registration.keycloak.scope=openid
-spring.security.oauth2.client.provider.keycloak.issuer-uri=http://localhost:18080/auth/realms/demo
 ```
 
 ### WebClient
 
-リソースサーバへのRESTの要求にアクセストークンを載せるための設定を追加する。
+リソースサーバへのRESTの要求に対して、アクセストークンを載せる必要がある。
+個々のRESTの送信処理にこの処理を埋め込まなくてもよいように、
+WebClient にフィルター（`ExchangeFilterFunction`）を仕込むことで、これを実現する。
+フィルタ自体は、Spring Security で提供されているため、実装自体は非常に簡単。
+
 具体的には、
 `ReactiveClientRegistrationRepository` と
 `ServerOAuth2AuthorizedClientRepository` から
 `ServerOAuth2AuthorizedClientExchangeFilterFunction` を生成し、
-`WebClient` の `filter()` に登録する。
+これを `WebClient` の `filter()` に登録する。
 
+実装例）
 ```java
 @Bean
 public WebClient webClientForHello(ReactiveClientRegistrationRepository clientRegistrations,
@@ -196,17 +273,29 @@ public WebClient webClientForHello(ReactiveClientRegistrationRepository clientRe
 }
 ```
 
+なお、
 `oauth.setDefaultClientRegistrationId("keycloak")`の引数には、
 `application.properties` で設定した
 `spring.security.oauth2.client.registration.XXXX` の `XXXX` の部分を設定する。
+（上記のソースコードは `XXXX` の部分が `keycloak` の場合の例）
 
 ※実際は、`oauth.setDefaultClientRegistrationId("keycloak")` と、
 `.baseUrl("http://localhost:8081/hello")` の引数の部分は `application.properties` で設定すべき。
 
 ### Java Config
 
-TODO
+認証の設定を行う。
+大まかな実装方法は以下のとおり。
 
+- `@EnableWebFluxSecurity`(このアノテーションは`@Configuration`を含んでいる) を付与した Configクラスで
+    `SecurityWebFilterChain` のBean(Bean名は`springSecurityFilterChain`)を定義する。  
+    ※TODO 要確認：Bean名は何でもよい？
+- `SecurityWebFilterChain` の Bean生成時のポイント
+    - `http.authorizeExchange()` で認可設定する。通常、トップ画面のように認証なしアクセス可能なパスを設定し、それ以外のパスは認証を要求する設定にする。（後で、Spring Boot Actuator を使用するときに少し改変する予定）
+    - `http.oauth2Client` でOAuth2.0のクライアントとして動作するように設定する。
+    - `http.logout()` でログアウト時に OIDC(OpenID Connect)としてログアウト処理をするように設定する。また、ログアウト後に遷移するパスを設定する。
+
+実装例）
 ```java
 @EnableWebFluxSecurity
 public class SecurityConfig {
@@ -222,7 +311,6 @@ public class SecurityConfig {
         // @formatter:off
         http.authorizeExchange()
                 .pathMatchers("/").permitAll()
-                .pathMatchers("/manage/**").permitAll()
                 .anyExchange().authenticated();
         // @formatter:on
 
